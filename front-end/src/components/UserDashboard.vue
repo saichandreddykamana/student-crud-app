@@ -114,6 +114,11 @@
   import axios from 'axios';
   export default {
     name: 'UserDashboard',
+    /**
+     * Initializes the data for the component.
+     *
+     * @return {Object} - The initial data for the component.
+     */
     data() {
       return {
         student: {
@@ -135,109 +140,193 @@
     },
 
     methods: {
-      getAllStudents() {
-        const axiosInstance = axios.create({
-              headers: {
-                'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
-                'Content-Type': 'application/json', 
-              },
-        });
-        axiosInstance.get('http://127.0.0.1:8000/api/students')
-          .then((response) => {
-            const students = response.data.students;
-            for (const student of students) {
-              if (student.student_id.toString().length < 8) {
-                student.student_id = student.student_id.toString().padStart(8, '0');
-              }   
-            }
-            this.students = students;
-          }).catch((error) => {
-              this.errorMsg = error.response.data.message;
-          })
-      },
-
-      addStudent() {
-        const axiosInstance = axios.create({
-              headers: {
-                'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
-                'Content-Type': 'application/json',
-              },
-        });
-        axiosInstance.post('http://127.0.0.1:8000/api/students', this.student)
-          .then((response) => {
-            this.getAllStudents();
-            this.student = {};
-            this.successMsg = response.data.message;
-          }).catch((error) => {
-              this.errorMsg = error.response.data.message;
-          })
-      },
-
-      editStudent(student_id) {
-        console.log(student_id);
-        const axiosInstance = axios.create({
+/**
+ * Retrieves all students from the API.
+ *
+ * @returns {undefined}
+ */
+        getAllStudents() {
+          // Create an instance of axios with custom headers
+          const axiosInstance = axios.create({
             headers: {
               'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
               'Content-Type': 'application/json', 
             },
-        });
-        axiosInstance.get(`http://127.0.0.1:8000/api/students/${student_id}`)
-          .then((response) => {
-            this.student = response.data.student;
-            this.student.student_id = this.student.student_id.toString().padStart(8, '0');
-            this.student.date_of_birth = new Date(this.student.date_of_birth).toISOString().split('T')[0];
-            this.student.create = false;
-          }).catch((error) => {
-              this.errorMsg = error.response.data.message;
-          })
-      },
-      deleteStudent(student_id){
-          const axiosInstance = axios.create({
-                  headers: {
-                    'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
-                    'Content-Type': 'application/json', 
-                  },
           });
 
-        axiosInstance.delete(`http://127.0.0.1:8000/api/students/${student_id}`).then((response) => {
-          this.students = response.data.students;
+          // Send GET request to retrieve students from the API
+          axiosInstance.get('http://127.0.0.1:8000/api/students')
+            .then((response) => {
+              // Extract the students data from the response
+              const students = response.data.students.map((student) => {
+                // Normalize student IDs to have 8 digits
+                if (student.student_id.toString().length < 8) {
+                  student.student_id = student.student_id.toString().padStart(8, '0');
+                }
+                return student;
+              });
+
+              // Update the students data in the component state
+              this.students = students;
+            }).catch((error) => {
+              // Handle error by setting error message
+              this.errorMsg = error.response.data.message;
+            });
+        },
+
+/**
+ * Adds a new student to the database.
+ */
+      addStudent() {
+        // Create an axios instance with the necessary headers
+        const axiosInstance = axios.create({
+          headers: {
+            'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        // Make a POST request to add the student to the database
+        axiosInstance.post('http://127.0.0.1:8000/api/students', this.student)
+          .then((response) => {
+            // After successfully adding the student, update the list of all students
+            this.getAllStudents();
+
+            // Reset the student object to clear the form fields
+            this.student = {};
+
+            // Set the success message to display to the user
             this.successMsg = response.data.message;
-        }).catch((error) => {
+          }).catch((error) => {
+            // If an error occurs, set the error message to display to the user
+            this.errorMsg = error.response.data.message;
+          });
+      },
+
+      /**
+       * Edit a student by ID.
+       * 
+       * @param {string} student_id - The ID of the student to edit.
+       */
+      editStudent(student_id) {
+        // Log the student ID
+        console.log(student_id);
+
+        // Create an instance of axios with the required headers
+        const axiosInstance = axios.create({
+          headers: {
+            'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
+            'Content-Type': 'application/json', 
+          },
+        });
+
+        // Make a GET request to retrieve the student details
+        axiosInstance.get(`http://127.0.0.1:8000/api/students/${student_id}`)
+          .then((response) => {
+            // Update the student object with the retrieved data
+            this.student = response.data.student;
+
+            // Format the student ID and date of birth
+            this.student.student_id = this.student.student_id.toString().padStart(8, '0');
+            this.student.date_of_birth = new Date(this.student.date_of_birth).toISOString().split('T')[0];
+
+            // Set the create flag to false
+            this.student.create = false;
+          }).catch((error) => {
+              // Handle any error that occurred during the request
               this.errorMsg = error.response.data.message;
           })
       },
+      /**
+       * Deletes a student with the given student_id.
+       * 
+       * @param {number} student_id - The ID of the student to delete.
+       */
+      deleteStudent(student_id) {
+        // Create an axios instance with the necessary headers
+        const axiosInstance = axios.create({
+          headers: {
+            'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
+            'Content-Type': 'application/json', 
+          },
+        });
 
+        // Send a DELETE request to the API
+        axiosInstance.delete(`http://127.0.0.1:8000/api/students/${student_id}`)
+          .then((response) => {
+            // Update the students data with the response data
+            this.students = response.data.students;
+            // Set the success message
+            this.successMsg = response.data.message;
+          })
+          .catch((error) => {
+            // Set the error message from the error response
+            this.errorMsg = error.response.data.message;
+          });
+      },
+
+      /**
+       * Modifies a student.
+       */
       modifyStudent() {
-        if(!this.student.create){
+        // Check if the student is being created or updated
+        if (!this.student.create) {
+          // Call the updateStudent function with the student_id
           this.updateStudent(this.student.student_id);
-        }else{
+        } else {
+          // Call the addStudent function
           this.addStudent();
         }
       },
 
+      /**
+       * Navigate to the student view page
+       * @param {string} student_id - The ID of the student
+       */
       viewStudent(student_id) {
+        // Redirect to the student view page
         this.$router.push(`/student/${student_id}`);
       },
 
-      updateStudent(student_id){
+    /**
+     * Update a student by their ID.
+     * 
+     * @param {number} student_id - The ID of the student to update.
+     */
+    updateStudent(student_id) {
+      // Create a new axios instance with the required headers.
       const axiosInstance = axios.create({
-            headers: {
-              'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
-              'Content-Type': 'application/json', // You can adjust this based on your API requirements
-            },
-        });
-        console.log('updateStudent', this.student);
-        axiosInstance.put(`http://127.0.0.1:8000/api/students/${student_id}`, this.student)
-          .then((response) => {
-            this.student = {};
-            this.getAllStudents();
-            this.successMsg = response.data.message;
-          }).catch((error) => {
-              this.errorMsg = error.response.data.message;
-          })
+        headers: {
+          'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
+          'Content-Type': 'application/json', // You can adjust this based on your API requirements
+        },
+      });
+
+      // Log the student object before making the API call.
+      console.log('updateStudent', this.student);
+
+      // Make a PUT request to update the student.
+      axiosInstance.put(`http://127.0.0.1:8000/api/students/${student_id}`, this.student)
+        .then((response) => {
+          // Reset the student object.
+          this.student = {};
+
+          // Refresh the list of all students.
+          this.getAllStudents();
+
+          // Set the success message.
+          this.successMsg = response.data.message;
+        }).catch((error) => {
+          // Set the error message.
+          this.errorMsg = error.response.data.message;
+        })
     }
     },
 
+    /**
+     * Lifecycle hook that is called when the component is mounted.
+     * Calls the getAllStudents method to fetch all students.
+     */
     mounted() {
       this.getAllStudents();
     }

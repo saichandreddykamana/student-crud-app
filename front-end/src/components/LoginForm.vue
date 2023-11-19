@@ -29,6 +29,11 @@
   
   export default defineComponent({
     name: 'LoginForm',
+    /**
+     * Initializes the data properties for the component.
+     *
+     * @return {Object} - The initial values for the email and password properties.
+     */
     data() {
       return {
         email: '',
@@ -36,23 +41,32 @@
       };
     },
     methods: {
+  /**
+   * Submits the form data to the server for login.
+   *
+   * @return {void} No return value.
+   */
       onSubmit() {
+        // Prepare the data object with email and password
         const data = {
           email: this.email,
           password: this.password,
         };
-  
+
+        // Make a POST request to the login API
         axios.post('http://127.0.0.1:8000/api/login', data)
           .then((response) => {
-            
-            
+            // Set the user as authenticated
             this.$store.dispatch('setUserAuthenticated', true);
+            
+            // Set the user's access token
             this.$store.dispatch('setUserAccessToken', response.data.token);
 
-            // Redirect to the dashboad once the user is logged in
+            // Redirect to the dashboard once the user is logged in
             this.$router.push('/dashboard', { replace: true });
           })
           .catch((error) => {
+            // Log any errors that occur during the request
             console.error(error);
           });
       },

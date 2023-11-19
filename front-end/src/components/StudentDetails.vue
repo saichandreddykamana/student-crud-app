@@ -92,77 +92,121 @@
 import axios from 'axios';
 
 export default {
-  data() {
-    return {
-        student: {
-            student_id: '',
-            surname: '',
-            title: '',
-            forename_1: '',
-            forename_2: '',
-            email: '',
-            username: '',
-            gender: '',
-            date_of_birth: ''
-        },
-        errorMsg: null,
-        successMsg: null
-    };
-  },
+/**
+ * Initializes the data for the component.
+ *
+ * @return {Object} - The initial data object.
+ */
+data() {
+  // Initialize the student object with empty values for its properties
+  const student = {
+    student_id: '',
+    surname: '',
+    title: '',
+    forename_1: '',
+    forename_2: '',
+    email: '',
+    username: '',
+    gender: '',
+    date_of_birth: ''
+  };
+
+  // Initialize the errorMsg and successMsg variables to null
+  const errorMsg = null;
+  const successMsg = null;
+
+  // Return the initial data object
+  return { student, errorMsg, successMsg };
+},
   methods: {
-    updateStudent(){
-      const axiosInstance = axios.create({
-            headers: {
-              'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
-              'Content-Type': 'application/json', // You can adjust this based on your API requirements
-            },
+      /**
+       * Update the student information using the API.
+       *
+       * @return {void} No return value.
+       */
+      updateStudent() {
+        // Create an axios instance with custom headers
+        const axiosInstance = axios.create({
+          headers: {
+            'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
+            'Content-Type': 'application/json', // You can adjust this based on your API requirements
+          },
         });
+
+        // Make a PUT request to update the student information
         axiosInstance.put(`http://127.0.0.1:8000/api/students/${this.student.student_id}`, this.student)
           .then((response) => {
+            // Update the student object with the response data
             this.student = response.data.student;
+            // Pad the student ID to 8 digits
             this.student.student_id = this.student.student_id.toString().padStart(8, '0');
+            // Format the date of birth to ISO string
             this.student.date_of_birth = new Date(this.student.date_of_birth).toISOString().split('T')[0];
+            // Set the success message
             this.successMsg = response.data.message;
-        }).catch((error) => {
-              this.errorMsg = error.response.data.message;
-          })
-    },
-    deleteStudent() {
-      const axiosInstance = axios.create({
-                  headers: {
-                    'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
-                    'Content-Type': 'application/json', 
-                  },
-          });
-
-        axiosInstance.delete(`http://127.0.0.1:8000/api/students/${this.student.student_id}`)
-          .then((response) => {
-            if(response.status === 200){
-              this.successMsg = response.data.message;
-              this.$router.push('/dashboard');
-            }
           }).catch((error) => {
-              this.errorMsg = error.response.data.message;
+            // Set the error message
+            this.errorMsg = error.response.data.message;
           })
-    },
+      },
+    /**
+     * Deletes a student from the API.
+     *
+     * @param {type} paramName - description of parameter
+     * @return {type} description of return value
+     */
+    deleteStudent() {
+      // Create an instance of axios with custom headers
+      const axiosInstance = axios.create({
+        headers: {
+          'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
+          'Content-Type': 'application/json', 
+        },
+      });
+
+      // Send a DELETE request to the API endpoint
+      axiosInstance.delete(`http://127.0.0.1:8000/api/students/${this.student.student_id}`)
+        .then((response) => {
+          // Check if the request was successful
+          if(response.status === 200){
+            // Set the success message and navigate to the dashboard
+            this.successMsg = response.data.message;
+            this.$router.push('/dashboard');
+          }
+        }).catch((error) => {
+          // Set the error message if an error occurred
+          this.errorMsg = error.response.data.message;
+        })
+    }
   },
 
-  mounted() {
-    const studentId = this.$route.params.id
-    const axiosInstance = axios.create({
-              headers: {
-                'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
-                'Content-Type': 'application/json', 
-              },
+    /**
+     * Mounts the component.
+     *
+     * @return {void}
+     */
+    mounted() {
+      const studentId = this.$route.params.id;
+
+      // Create a new instance of axios with custom headers
+      const axiosInstance = axios.create({
+        headers: {
+          'Authorization': `Bearer ${this.$store.state.userAccessToken}`,
+          'Content-Type': 'application/json', 
+        },
+      });
+
+      // Make GET request to retrieve student data
+      axiosInstance.get(`http://127.0.0.1:8000/api/students/${studentId}`)
+        .then((response) => {
+          console.log(response.data);
+
+          // Update component data with student information
+          this.student = response.data.student;
+          this.student.student_id = this.student.student_id.toString().padStart(8, '0');
+          this.student.date_of_birth = new Date(this.student.date_of_birth).toISOString().split('T')[0];
         });
-        axiosInstance.get(`http://127.0.0.1:8000/api/students/${studentId}`)
-          .then((response) => {
-            console.log(response.data);
-            this.student = response.data.student;
-            this.student.student_id = this.student.student_id.toString().padStart(8, '0');
-            this.student.date_of_birth = new Date(this.student.date_of_birth).toISOString().split('T')[0];
-        })
-  }
+    }
 };
 </script>
 

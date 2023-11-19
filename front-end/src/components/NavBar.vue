@@ -34,6 +34,11 @@ import axios from 'axios';
   export default {
     name: 'NavBar',
 
+    /**
+     * Initializes the data object with empty email and password properties.
+     *
+     * @return {Object} The data object with email and password properties.
+     */
     data() {
       return {
         email: '',
@@ -42,25 +47,41 @@ import axios from 'axios';
     },
 
     computed: {
+      /**
+       * Check if the user is authenticated.
+       *
+       * @return {Boolean} Whether the user is authenticated or not.
+       */
       isUserAuthenticated() {
         return this.$store.state.isUserAuthenticated;
       },
     },
 
     methods: {
-      logout() {
-        axios.get('http://127.0.0.1:8000/api/logout')
-          .then((response) => {
-            if(response.data.code === 200) {
-              localStorage.removeItem('isAuthenticated');
-              this.$store.dispatch('setUserAuthenticated', false);
-              this.$store.dispatch('setUserAccessToken', null);
-              this.$router.push('/login');
-            }
-          });
-      },
-    },
-  };
+    /**
+     * Logout the user and remove their authentication information.
+     *
+     * @return {void} No return value.
+     */
+    logout() {
+      // Send a GET request to the logout API endpoint
+      axios.get('http://127.0.0.1:8000/api/logout')
+        .then((response) => {
+          // Check if the response code is 200
+          if(response.data.code === 200) {
+            // Remove the 'isAuthenticated' value from local storage
+            localStorage.removeItem('isAuthenticated');
+            // Dispatch an action to update the user's authenticated status in the store
+            this.$store.dispatch('setUserAuthenticated', false);
+            // Dispatch an action to set the user's access token to null in the store
+            this.$store.dispatch('setUserAccessToken', null);
+            // Redirect the user to the login page
+            this.$router.push('/login');
+          }
+        });
+    }
+        },
+      };
   </script>
   
   <style scoped>

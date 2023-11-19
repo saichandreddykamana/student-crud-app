@@ -33,31 +33,43 @@
  <script>
     import axios from 'axios';
     export default {
-    data() {
-        return {
+      /**
+       * Initializes the data for the component.
+       *
+       * @return {Object} The initial data object.
+       */
+      data() {
+         return {
+            // Initialize the user object with name, email, and password properties
             user: {
-                name: '',
-                email: '',
-                password: ''
+                  name: '',
+                  email: '',
+                  password: ''
             },
+            // Initialize the confirmPassword property
             confirmPassword: ''
-        }
-    },
+         }
+      },
     methods: {
-        register() {
-            if(this.user.password === this.confirmPassword) {
-               axios.post('http://127.0.0.1:8000/api/register', this.user)
-                .then((response) => {
-                    console.log(response);
-                    this.$store.dispatch('setUserAuthenticated', true);
-                    this.$store.dispatch('setUserAccessToken', response.data.token);
+      /**
+       * Registers the user by sending a POST request to the server with user data.
+       * If the password matches the confirm password, it handles the response and performs the necessary actions.
+       *
+       * @return {void} This function does not return any value.
+       */
+      register() {
+         if (this.user.password === this.confirmPassword) {
+            axios.post('http://127.0.0.1:8000/api/register', this.user)
+                  .then((response) => {
+                     console.log(response);
+                     this.$store.dispatch('setUserAuthenticated', true);
+                     this.$store.dispatch('setUserAccessToken', response.data.token);
 
-                    // Redirect to the dashboad once the user is logged in
-                    this.$router.push('/dashboard', { replace: true });
-
-                })
-            }
-        }
+                     // Redirect to the dashboard once the user is logged in
+                     this.$router.push('/dashboard', { replace: true });
+                  });
+         }
+      }
     }
     }
 </script>

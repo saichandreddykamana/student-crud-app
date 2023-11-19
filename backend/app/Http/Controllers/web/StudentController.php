@@ -8,6 +8,12 @@ use App\Http\Controllers\Controller as BaseController;
 
 class StudentController extends BaseController
 {
+    /**
+     * Retrieves all students from the database.
+     *
+     * @throws \Exception if an error occurs during the retrieval process.
+     * @return array|null An array of student objects or null if an error occurred.
+     */
     public static function index()
     {
         try {
@@ -18,6 +24,13 @@ class StudentController extends BaseController
         }
     }
 
+    /**
+     * Store a new student record.
+     *
+     * @param Request $request The request object containing the student data.
+     * @throws \Exception if an error occurs during the storage process.
+     * @return Student The newly created student record.
+     */
     public static function store(Request $request){
         try{
             $student = new Student();
@@ -37,6 +50,13 @@ class StudentController extends BaseController
         }
     }
 
+    /**
+     * Checks if a student exists in the database based on the given request.
+     *
+     * @param Request $request The request object containing the student information.
+     * @throws \Exception If an error occurs while checking the student existence.
+     * @return bool Returns true if the student does not exist, false otherwise.
+     */
     public static function checkStudentExists(Request $request){
         try{
             $student_id = Student::where('student_id',$request->input('student_id'))->first();
@@ -48,6 +68,13 @@ class StudentController extends BaseController
         }
     }
 
+    /**
+     * Retrieve and return the specified student's details.
+     *
+     * @param string $id The ID of the student to retrieve.
+     * @throws \Exception If an error occurs during the retrieval process.
+     * @return array|null The selected fields of the student if found, or null if not found.
+     */
     public static function show(string $id){
         try{
             $student = Student::find($id);
@@ -61,6 +88,13 @@ class StudentController extends BaseController
         }
     }
 
+    /**
+     * Deletes a student record from the database.
+     *
+     * @param string $id The ID of the student record to delete.
+     * @throws \Exception If an error occurred during the deletion process.
+     * @return bool Returns true if the student record was successfully deleted, false otherwise.
+     */
     public static function destroy(string $id){
         try{
             $student = Student::find($id);
@@ -74,6 +108,14 @@ class StudentController extends BaseController
         }
     }
 
+    /**
+     * Updates a student record in the database.
+     *
+     * @param Request $request The HTTP request object.
+     * @param string $id The ID of the student record to update.
+     * @return Student|null The updated student record, or null if the record does not exist.
+     * @throws \Exception if an error occurs during the update process.
+     */
     public static function update(Request $request, string $id){
         try{
             $student = Student::find($id);

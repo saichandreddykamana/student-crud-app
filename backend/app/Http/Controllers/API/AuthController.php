@@ -11,7 +11,12 @@ use Hash;
 
 class AuthController extends Controller
 {
-    //
+    /**
+     * Handle user login coming from Vue frontend.
+     *
+     * @param Request $request The login request object.
+     * @return \Illuminate\Http\JsonResponse The JSON response with the authentication token and user object.
+     */
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -29,13 +34,26 @@ class AuthController extends Controller
         return response()->json(['error' => 'Unauthorized'], 401);
     }
 
+    /**
+     * Log out the user.
+     *
+     * Revoke the authentication token of the authenticated user and return a JSON response.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function logout(){
         if(Auth::check()) {
             Auth::user()->token()->revoke();
         }
         return response()->json(['message' => 'Successfully logged out', 'code' => 200], 200);
     }
-
+    
+    /**
+     * Handle user registration coming from the Vue frontend.
+     *
+     * @param Request $request The registration request object.
+     * @return \Illuminate\Http\JsonResponse The JSON response with the generated authentication token.
+     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
