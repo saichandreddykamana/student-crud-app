@@ -16,6 +16,15 @@
 
 <script>
     export default {
+        data() {
+            return {
+                students: []
+            }
+        },
+
+        created() {
+            
+        },
         mounted() {
             console.log('Component mounted.')
         }
