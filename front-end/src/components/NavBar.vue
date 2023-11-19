@@ -57,7 +57,7 @@ import axios from 'axios';
               this.$store.dispatch('setUserAccessToken', null);
               this.$router.push('/login');
             }
-          })
+          });
       },
     },
   };

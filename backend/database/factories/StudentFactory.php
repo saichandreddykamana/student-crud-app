@@ -23,7 +23,7 @@ class StudentFactory extends Factory
         
         return [
             'title' => $this->faker->randomElement(['Dr', 'Mr', 'Mrs', 'Ms', 'Mx', 'Professor']),
-            'student_id' => $this->faker->unique()->numerify('########'),
+            'student_id' => $this->generateRandomNumericID(),
             'forename_1' => $generatedFirstName,
             'forename_2' => $generatedFirstName,
             'surname' => $generatedLastName,
@@ -32,5 +32,13 @@ class StudentFactory extends Factory
             'username' => substr($generatedUsername, 0, 6), // Get the first 6 characters
             'email' => $generatedEmail,
         ];
+    }
+
+    public function generateRandomNumericID() {
+        $id = $this->faker->numerify('########');
+        while (strlen($id) < 8) {
+            $id = $this->faker->numerify('########');
+        }
+        return $id;
     }
 }

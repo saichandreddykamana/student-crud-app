@@ -16,8 +16,9 @@ class StudentController extends BaseController
     public function index(Request $request)
     {
         try {
-            $students = WebStudentController::index($request);
+            $students = WebStudentController::index();
             if($students->count() > 0) {
+
                 return response()->json([
                     'status' => 200,
                     'students' => $students,
@@ -40,7 +41,6 @@ class StudentController extends BaseController
     {
         try{
             $validator = Validator::make($request->all(), [
-                'student_id' => 'required|digits:8',
                 'title' => 'in:'. implode(',', array('Dr','Mr', 'Mrs', 'Ms', 'Mx', 'Professor')),
                 'forename_1' => 'string|max:100',
                 'forename_2' => 'string|max:100',
@@ -58,10 +58,12 @@ class StudentController extends BaseController
             }else{
                 $studentExists = WebStudentController::checkStudentExists($request);
                 if($studentExists){
+                    $student_id = str_pad(mt_rand(1,99999999),8,'0',STR_PAD_LEFT);
+                    $request-> merge(['student_id' => $student_id]);
                     $student = WebStudentController::store($request);
                     return response()->json([
                         'status' => 200,
-                        'message' => 'Student created successfully with ID : '.$student->student_id
+                        'message' => 'Student created successfully with ID : '.$student_id
                     ], 200);
                 }else{
                     return response()->json([
@@ -132,7 +134,8 @@ class StudentController extends BaseController
                     if($student){
                         return response()->json([
                             'status' => 200,
-                            'message' => 'Student updated successfully with ID : '.$id
+                            'message' => 'Student updated successfully with ID : '.$id,
+                            'student' => $student
                         ], 200);
                     }
                     return response()->json([
@@ -160,9 +163,11 @@ class StudentController extends BaseController
             if(strlen($id) == 8){
                 $student = WebStudentController::destroy($id);
                 if($student){
+                    $students = WebStudentController::index();
                     return response()->json([
                         'status' => 200,
                         'message' => 'Student deleted successfully with ID : '.$id,
+                        'students' => $students
                     ], 200);
                 }
                 return response()->json([

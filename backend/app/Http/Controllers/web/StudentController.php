@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller as BaseController;
 
 class StudentController extends BaseController
 {
-    public static function index(Request $request)
+    public static function index()
     {
         try {
             $students = Student::select('student_id', 'title', 'forename_1', 'forename_2', 'surname', 'gender', 'date_of_birth', 'username', 'email')->where('deleted_at', null) ->get();
