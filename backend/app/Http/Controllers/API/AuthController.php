@@ -14,8 +14,14 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
+            $user_obj  = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email
+            ];
+
             $token = $user->createToken('MyApp')->accessToken;
-            return response()->json(['token' => $token], 200);
+            return response()->json(['token' => $token, 'user' => $user_obj, 'isAuthenticated' => true], 200);
         }
         return response()->json(['error' => 'Unauthorized'], 401);
     }
@@ -24,7 +30,7 @@ class AuthController extends Controller
         if(Auth::check()) {
             Auth::user()->token()->revoke();
         }
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Successfully logged out', 'code' => 200], 200);
     }
 
     public function register(Request $request)

@@ -52,7 +52,7 @@ class StudentController extends BaseController
         try{
             $student = Student::find($id);
             if($student != null && $student['deleted_at'] == null ){
-                $selectedFields = $student ->only(['title', 'forename_1', 'forename_2', 'surname', 'gender', 'date_of_birth', 'username', 'email']);
+                $selectedFields = $student ->only(['student_id', 'title', 'forename_1', 'forename_2', 'surname', 'gender', 'date_of_birth', 'username', 'email']);
                 return $selectedFields;
             }
             return null;
